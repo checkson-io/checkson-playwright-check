@@ -1,5 +1,5 @@
 {
-  "name": "checkson-puppeteer-check",
+  "name": "checkson-playwright-check",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

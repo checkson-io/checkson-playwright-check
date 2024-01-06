@@ -1,5 +1,4 @@
-#FROM node:20-slim
-FROM ghcr.io/puppeteer/puppeteer:21.3.6
+FROM mcr.microsoft.com/playwright:v1.40.0-jammy
 
 WORKDIR /usr/src/app
 COPY package*.json /usr/src/app
