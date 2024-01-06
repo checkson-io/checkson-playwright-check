@@ -1,6 +1,6 @@
 # checkson-playwright-check
 
-This repo open a website using Playwright and makes a screenshot.
+This check opens a website using Playwright and makes a screenshot.
 
 ## Run check locally
 
