@@ -1,44 +1,45 @@
-const { chromium } = require('playwright');
-const fs = require('fs');
+import { chromium } from 'playwright';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 
 const { CHECKSON_DIR } = process.env;
-const USERNAME = process.env.USERNAME || 'student';
-const PASSWORD = process.env.PASSWORD || 'Password123';
+const USERNAME = process.env.LOGIN_USERNAME || 'student';
+const PASSWORD = process.env.LOGIN_PASSWORD || 'Password123';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'https://practicetestautomation.com/practice-test-login/';
+const USERNAME_SELECTOR = process.env.USERNAME_SELECTOR || '#username';
+const PASSWORD_SELECTOR = process.env.PASSWORD_SELECTOR || '#password';
+const SUBMIT_SELECTOR = process.env.SUBMIT_SELECTOR || '#submit.btn';
+const MESSAGE_SELECTOR = process.env.MESSAGE_SELECTOR || '#loop-container > div > article > div.post-header > h1';
+const MESSAGE_TEXT = process.env.MESSAGE_TEXT || 'Logged In Successfully';
 
 (async () => {
     const browser = await chromium.launch({
-        headless: true, // Playwright uses `true` for headless mode
+        headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const attachmentsDir = `${CHECKSON_DIR}/attachments`;
-    if (!fs.existsSync(attachmentsDir)){
-        fs.mkdirSync(attachmentsDir);
+    if (!existsSync(attachmentsDir)){
+        mkdirSync(attachmentsDir);
     }
     const screenshotFilePath = `${attachmentsDir}/screenshot.jpg`;
 
     const page = await browser.newPage();
-    await page.setDefaultTimeout(5000);
+    page.setDefaultTimeout(5000);
 
     let loginSuccessful = false;
 
     try {
 
-        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.setViewportSize({ width: 1280, height: 1200 });
 
-        const website_url = 'https://practicetestautomation.com/practice-test-login/';
+        await page.goto(WEBSITE_URL);
+        await page.fill(USERNAME_SELECTOR, USERNAME);
+        await page.fill(PASSWORD_SELECTOR, PASSWORD);
+        await page.click(SUBMIT_SELECTOR);
 
-        await page.goto(website_url);
-        await page.fill('#username', USERNAME);
-        await page.fill('#password', PASSWORD);
-        await page.click('button[id=submit]');
-
-        await page.waitForSelector('//*[contains(text(), "Logged In Successfully")]');
-        await page.getByText('Logged In Successfully')
-        await expect(element !== undefined ).toBeTruthy();
+	await page.$eval(MESSAGE_SELECTOR, (el, text) => el.value === text, MESSAGE_TEXT);
 
         await page.screenshot({ path: screenshotFilePath });
-
         loginSuccessful = true;
     } catch (error) {
         console.log(error);
@@ -54,7 +55,7 @@ const PASSWORD = process.env.PASSWORD || 'Password123';
 
     console.log(message);
 
-    fs.writeFileSync(`${CHECKSON_DIR}/message`, message);
+    writeFileSync(`${CHECKSON_DIR}/message`, message);
 
     const exitCode = loginSuccessful ? 0 : 1;
     process.exit(exitCode);
